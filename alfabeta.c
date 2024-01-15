@@ -17,8 +17,11 @@ int alfaBeta(stan s, int glebokosc, int alfa, int beta)
 */
 void zabij_ruchy(element* ofiara)
 {
-    if(ofiara)
+    if(ofiara){
+        
         zabij_ruchy(ofiara->nastepny);
+        //printf("zabito %d\n",ofiara->dostepne.pozycja);
+    }
     free(ofiara);
 
 }
@@ -27,16 +30,17 @@ int alfaBeta(plansza* stol,int glebokosc,int alfa,int beta,int* debesciak)
     element* glowa = NULL;
     //element* lista_posuniec = NULL;
     glowa = dostepne_ruchy(stol,glowa,0,0);
-    if(!glebokosc || !glowa)
+    if(!glebokosc || !glowa){
             
+            zabij_ruchy(glowa);
             return ocena_pozycji(stol);
-    
+    }
     else{
         do 
         {
             plansza* kopia = utworz_plansze(kopia,stol->gracz_na_ruchu,stol->wartosci,0); //do kopii daję wartosci ze stolu zeby miala takie same
             //lista_posuniec = dostepne_ruchy(kopia,lista_posuniec,glowa->dostepne.pozycja,1);
-            postaw_pionek(kopia,glowa->dostepne.pozycja);
+            postaw_pionek(kopia,&glowa->dostepne.pozycja);
             int ocena_czymtasowa = -alfaBeta(kopia,glebokosc - 1,-alfa,-beta,debesciak);
             
             kopia->gracz_na_ruchu = stol->gracz_na_ruchu == "O" ? "X" : "O"; //zmiana gracza na ruchu
@@ -51,15 +55,17 @@ int alfaBeta(plansza* stol,int glebokosc,int alfa,int beta,int* debesciak)
                 *debesciak = glowa->dostepne.pozycja;
                 //printf("best - %d ocena - %d\n",*debesciak,alfa);
             }
-            //if(glowa->poprzedni)
-                free(glowa->poprzedni);
             
             glowa = glowa->nastepny;
+            
+            
             free(kopia);
         }while(glowa);
         
-        //zabij_ruchy(glowa);
+        zabij_ruchy(glowa);
+        
         return alfa;
     }
+    
 }
 #endif
